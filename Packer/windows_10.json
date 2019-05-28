@@ -6,7 +6,8 @@
         "winrm_password": "vagrant",  
         "winrm_username": "vagrant",
 
-        
+        "guest_os_type":"windows9-64",
+        "version":"14",
         "iso_url": "{{user `iso_url`}}",
         "iso_checksum_type": "{{user `iso_checksum_type`}}",
         "iso_checksum": "{{user `iso_checksum`}}",
@@ -23,18 +24,19 @@
           "./scripts/fixnetwork.ps1",
           "./scripts/dis-updates.ps1"
         ],
+
         "vmx_data": {
           "memsize": "{{user `memory_size`}}",
           "numvcpus": "{{user `cpus`}}",
-          "scsi0.virtualDev": "lsisas1068"
+          "scsi0.virtualDev": "lsisas1068",
+          "scsi0.present" : "TRUE"
         }
+
       }
      ],
     "provisioners": [
       {
         "type": "windows-shell",
-        "remote_path": "/tmp/script.bat",
-        "execute_command": "{{.Vars}} cmd /c C:/Windows/Temp/script.bat",
         "scripts": [
           "./scripts/powercfg.bat",
           "./scripts/vm-guest-tools.bat",
