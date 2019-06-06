@@ -1,0 +1,66 @@
+{
+    "builders": [
+      {
+        "type": "vmware-iso",
+        "communicator": "winrm",
+        "winrm_password": "vagrant",  
+        "winrm_username": "vagrant",
+        "guest_os_type": "windows8srv-64",
+        "version":"14",
+        "iso_url": "{{user `iso_url`}}",
+        "iso_checksum_type": "{{user `iso_checksum_type`}}",
+        "iso_checksum": "{{user `iso_checksum`}}",
+        "headless": "{{user `headless`}}",
+        "boot_wait": "2m",
+        
+        "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+        "tools_upload_flavor": "windows",
+        "disk_size": "{{user `disk_size`}}",
+        "vnc_port_min": 5900,
+        "vnc_port_max": 5980,
+        "floppy_files": [
+          "{{user `autounattend`}}",
+          "./scripts/fixnetwork.ps1",
+          "./scripts/dis-updates.ps1"
+        ],
+
+        "vmx_data": {
+          "memsize": "{{user `memory_size`}}",
+          "numvcpus": "{{user `cpus`}}",
+          "scsi0.virtualDev": "lsisas1068",
+          "scsi0.present" : "TRUE"
+        }
+
+      }
+     ],
+    "provisioners": [
+      {
+        "type": "windows-shell",
+        "scripts": [
+          "./scripts/powercfg.bat",
+          "./scripts/vm-guest-tools.bat",
+          "./scripts/disable-auto-logon.bat",
+          "./scripts/enable-rdp.bat",
+          "./scripts/compact.bat"
+        ]
+      }
+    ],
+    "post-processors": [
+      {
+        "type": "vagrant",
+        "keep_input_artifact": false,
+        "output": "windows_2012r2_{{.Provider}}.box",
+        "vagrantfile_template": "vagrantfile-windows_10.template"
+      }
+    ],
+    "variables": {
+      "iso_url": "put iso url here",
+      "iso_checksum_type": "sha1",
+      "iso_checksum": "849734F37346385DAC2C101E4AACBA4626BB141C",
+      "autounattend": "./answer/12r2/Autounattend.xml",
+      "headless": "false",
+      "cpus": "4",
+      "memory_size": "4096",
+      "disk_size": "61440"
+    }
+  }
